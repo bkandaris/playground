@@ -21,7 +21,7 @@ const Answer = props => {
       value={props.letter}
       onClick={handleClick}>
       <span className='answer'>
-        {props.letter} {props.answer}
+        {props.letter.toUpperCase()} {props.answer}
       </span>
     </button>
   );

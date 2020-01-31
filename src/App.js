@@ -5,6 +5,9 @@ import Progress from './Components/Progress';
 import Question from './Components/Question';
 import Answers from './Components/Answers';
 
+import quizReducer from './reducers/quizReducer';
+import QuizContext from './Context/QuizContext';
+
 import {
   SET_ANSWERS,
   SET_CURRENT_QUESTION,
@@ -14,65 +17,7 @@ import {
   RESET_QUIZ
 } from './reducers/types';
 
-const quizReducer = (state, action) => {
-  switch (action.type) {
-    case SET_CURRENT_ANSWER:
-      return {
-        ...state,
-        // might switch to action.currentAnswer
-        currentAnswer: action.currentAnswer
-      };
-    case SET_CURRENT_QUESTION:
-      return {
-        ...state,
-        // might switch to action.currentAnswer
-        currentQuestion: action.currentQuestion
-      };
-    case SET_ERROR:
-      return {
-        ...state,
-        // might switch to action.currentAnswer
-        error: action.error
-      };
-    case SET_SHOW_RESULTS:
-      return {
-        ...state,
-        // might switch to action.currentAnswer
-        showResults: action.showResults
-      };
-    case SET_ANSWERS:
-      return {
-        ...state,
-        // might switch to action.currentAnswer
-        setAnswers: action.setAnswers
-      };
-    case RESET_QUIZ:
-      return {
-        ...state,
-        // might switch to action.currentAnswer
-        answers: [],
-        currentQuestion: 0,
-        currentAnswer: '',
-        showResults: false,
-        error: ''
-      };
-    default:
-      return state;
-  }
-};
-
 function App() {
-  const initialState = {
-    currentQuestion: 0,
-    currentAnswer: '',
-    answers: [],
-    showResults: false,
-    error: ''
-  };
-
-  const [state, dispatch] = useReducer(quizReducer, initialState);
-  const { currentQuestion, currentAnswer, answers, showResults, error } = state;
-
   const questions = [
     {
       id: 1,
@@ -104,6 +49,17 @@ function App() {
       correct_answer: 'c'
     }
   ];
+  const initialState = {
+    questions,
+    currentQuestion: 0,
+    currentAnswer: '',
+    answers: [],
+    showResults: false,
+    error: ''
+  };
+
+  const [state, dispatch] = useReducer(quizReducer, initialState);
+  const { currentQuestion, currentAnswer, answers, showResults, error } = state;
 
   const question = questions[currentQuestion];
 
@@ -173,19 +129,17 @@ function App() {
     );
   } else {
     return (
-      <div className='container'>
-        <Progress total={questions.length} current={currentQuestion + 1} />
-        <Question question={question.question} />
-        {renderError()}
-        <Answers
-          question={question}
-          currentAnswer={currentAnswer}
-          dispatch={dispatch}
-        />
-        <button className='btn btn-primary' onClick={next}>
-          Confirm and continue
-        </button>
-      </div>
+      <QuizContext.Provider value={{ state, dispatch }}>
+        <div className='container'>
+          <Progress total={questions.length} current={currentQuestion + 1} />
+          <Question />
+          {renderError()}
+          <Answers />
+          <button className='btn btn-primary' onClick={next}>
+            Confirm and continue
+          </button>
+        </div>
+      </QuizContext.Provider>
     );
   }
 }
